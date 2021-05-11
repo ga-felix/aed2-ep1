@@ -1,0 +1,1 @@
+start cmd.exe /k "cd %~dp0 & gcc -c graphopmatrixdi.c & gcc -c main.c & gcc -o runmatrix.exe graphopmatrixdi.o main.o & runmatrix > debug.txt"

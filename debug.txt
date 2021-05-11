@@ -1,0 +1,15 @@
+[INSERT-EDGE] Edge inserted between 0 and 3 of weight 6.300000
+[INSERT-EDGE] Edge inserted between 2 and 1 of weight 5.000000
+[INSERT-EDGE] Edge inserted between 2 and 0 of weight 9.000000
+[INSERT-EDGE] Edge inserted between 1 and 3 of weight 1.700000
+[INSERT-EDGE] Edge inserted between 0 and 1 of weight 9.000000
+[INSERT-EDGE] Edge inserted between 3 and 1 of weight 5.600000
+[INSERT-EDGE] Edge inserted between 0 and 2 of weight 7.200000
+[PRINT] Node 0
+Connections: 1 (weight 9.000000), 2 (weight 7.200000), 3 (weight 6.300000), 
+[PRINT] Node 1
+Connections: 0 (weight 9.000000), 2 (weight 5.000000), 3 (weight 5.600000), 
+[PRINT] Node 2
+Connections: 0 (weight 7.200000), 1 (weight 5.000000), 
+[PRINT] Node 3
+Connections: 0 (weight 6.300000), 1 (weight 5.600000), 
