@@ -23,6 +23,13 @@ bool initialize(Graph *graph, int nodesNumber) {
     return true;
 }
 
+int findKey(int key, int *array) {
+    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++) {
+        if(key == array[i]) return i;
+    }
+    return -1;
+}
+
 void initializeArray(int *array) {
     for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++) {
         array[i] = -1;
@@ -200,6 +207,21 @@ void DFS (Graph* graph) {
     }
 
     fprintf(filePointer, "%s", tree);
+    char* str;
+    int aux[graph->nodesNumber];
+    initializeArray(aux);
+
+    for(int index = 0; index < graph->nodesNumber; index++) {
+        int search = graph->nodesNumber - 1;
+        aux[search] = index;
+        search--;
+        int nextStep = index;
+        while(predecessor[nextStep] != -1) {
+            nextStep = predecessor[nextStep];
+            aux[search] = nextStep;
+            search--;
+        }
+    }
 }
 
 /* Color 0 <=> white, 1 <=> gray, 2 <=> black */
