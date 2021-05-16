@@ -30,8 +30,8 @@ int findKey(int key, int *array) {
     return -1;
 }
 
-void initializeArray(int *array) {
-    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++) {
+void initializeArray(int *array, int len) {
+    for(int i = 0; i < len; i++) {
         array[i] = -1;
     }
 }
@@ -55,7 +55,7 @@ bool print(Graph *graph) {
 
     fprintf(filePointer, "%d %d\n", graph->nodesNumber, graph->edgesNumber);
     int alreadyPrinted[graph->nodesNumber];
-    initializeArray(alreadyPrinted);
+    initializeArray(alreadyPrinted, graph->nodesNumber);
 
     for(int line = 0; line < graph->nodesNumber; line++) {
         fprintf(stdout, "[PRINT] Node %d\nConnections: ", line);
@@ -188,14 +188,16 @@ int readGraph(char* fileName, Graph* graph) {
 /* DFS */
 
 void DFS (Graph* graph) {
-    int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], endTimer[graph->nodesNumber], predecessor[graph->edgesNumber];
+    int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], endTimer[graph->nodesNumber], predecessor[graph->nodesNumber];
     char tree[(graph->nodesNumber * 2)];
     tree[0] = '\0';
     char paths[(graph->nodesNumber * graph->edgesNumber * 2)];
     paths[0] = '\0';
     int time = 0;
     for(int line = 0; line < graph->nodesNumber; line++) {
-        colors[line], foundTimer[line], endTimer[line] = 0;
+        colors[line] = 0;
+        foundTimer[line] = 0;
+        endTimer[line] = 0;
         predecessor[line] = -1;
     }
 
@@ -203,25 +205,27 @@ void DFS (Graph* graph) {
     fprintf(filePointer, "\nBP:\n");
 
     for(int line = 0; line < graph->nodesNumber; line++) {
-        visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, filePointer, tree, paths);
+        if(colors[line] == 0){
+            visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, filePointer, tree, paths);
+        }
     }
 
     fprintf(filePointer, "%s", tree);
-    char* str;
-    int aux[graph->nodesNumber];
-    initializeArray(aux);
+    fprintf(filePointer, "\nCaminhos BP:\n");
 
+    char str[10];
     for(int index = 0; index < graph->nodesNumber; index++) {
-        int search = graph->nodesNumber - 1;
-        aux[search] = index;
-        search--;
         int nextStep = index;
+        //fprintf(stdout, "\n%d precede %d", nextStep, predecessor[nextStep]);
         while(predecessor[nextStep] != -1) {
             nextStep = predecessor[nextStep];
-            aux[search] = nextStep;
-            search--;
+            sprintf(str, "%d ", nextStep);
+            strcat(paths, str);
         }
+        sprintf(str, "%d\n", index);
+        strcat(paths, str);
     }
+    fprintf(filePointer, "%s", paths);
 }
 
 /* Color 0 <=> white, 1 <=> gray, 2 <=> black */
@@ -229,14 +233,9 @@ void DFS (Graph* graph) {
 void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, FILE* f, char* tree, char* paths) {
     colors[node] = 1;
     foundTimer[node] = ++(*time);
-    char* str;
-    if(node != graph->nodesNumber - 1) {
-        sprintf(str, "%d ", node);
-        strcat(tree, str);
-    } else {
-        sprintf(str, "%d\n", node);
-        strcat(tree, str);
-    }
+    char str[15];
+    sprintf(str, "%d ", node);
+    strcat(tree, str);
 
     for(int column = 0; column < graph->nodesNumber; column++) { // Percorre as adjacências
         if(isConnected(graph, node, column)) { // Checa se existe aresta entre 'node' e 'column'
