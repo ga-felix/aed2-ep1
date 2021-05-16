@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "graphmatrix.h"
 
 #define EMPTY_NODE -1 /* Signs an empty node
@@ -181,6 +182,10 @@ int readGraph(char* fileName, Graph* graph) {
 
 void DFS (Graph* graph) {
     int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], endTimer[graph->nodesNumber], predecessor[graph->edgesNumber];
+    char tree[(graph->nodesNumber * 2)];
+    tree[0] = '\0';
+    char paths[(graph->nodesNumber * graph->edgesNumber * 2)];
+    paths[0] = '\0';
     int time = 0;
     for(int line = 0; line < graph->nodesNumber; line++) {
         colors[line], foundTimer[line], endTimer[line] = 0;
@@ -191,26 +196,31 @@ void DFS (Graph* graph) {
     fprintf(filePointer, "\nBP:\n");
 
     for(int line = 0; line < graph->nodesNumber; line++) {
-        visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, filePointer);
+        visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, filePointer, tree, paths);
     }
+
+    fprintf(filePointer, "%s", tree);
 }
 
 /* Color 0 <=> white, 1 <=> gray, 2 <=> black */
 
-void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, FILE* f) {
+void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, FILE* f, char* tree, char* paths) {
     colors[node] = 1;
     foundTimer[node] = ++(*time);
+    char* str;
     if(node != graph->nodesNumber - 1) {
-        fprintf(f, "%d ", node);
+        sprintf(str, "%d ", node);
+        strcat(tree, str);
     } else {
-        fprintf(f, "%d\n", node);
+        sprintf(str, "%d\n", node);
+        strcat(tree, str);
     }
 
     for(int column = 0; column < graph->nodesNumber; column++) { // Percorre as adjacências
         if(isConnected(graph, node, column)) { // Checa se existe aresta entre 'node' e 'column'
             if(colors[column] == 0) { // Checa se é branco
                 predecessor[column] = node;
-                visitDFS(graph, column, time, colors, foundTimer, endTimer, predecessor, f);
+                visitDFS(graph, column, time, colors, foundTimer, endTimer, predecessor, f, tree, paths);
             }
         }
     }
