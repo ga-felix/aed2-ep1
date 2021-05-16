@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include "graphmatrix.h"
 
@@ -211,30 +210,22 @@ void DFS (Graph* graph) {
         }
     }
 
-    tree[strlen(tree) - 1] = '\0';
     fprintf(filePointer, "%s", tree);
-    fprintf(filePointer, "\n\nCaminhos BP:\n");
+    fprintf(filePointer, "\nCaminhos BP:\n");
 
-    char str[15];
-
+    char str[10];
     for(int index = 0; index < graph->nodesNumber; index++) {
-        char line[(graph->nodesNumber * graph->edgesNumber * 2)];
-        line[0] = '\0';
         int nextStep = index;
         bool hasNext = true;
         while(hasNext) {
             sprintf(str, "%d ", nextStep);
-            char *tmp = strdup(line);
-            strcpy(line, str);
-            strcat(line, tmp);
-            free(tmp);
-
+            memmove(paths + strlen(str), paths, strlen(paths) + 1);
+            memcpy(paths, str, strlen(str));
             if(predecessor[nextStep] < 0) {
+                char* bl = "\n";
+                memmove(paths + strlen(bl), paths, strlen(paths) + 1);
+                memcpy(paths, bl, strlen(bl));
                 hasNext = false;
-                line[strlen(line) - 1] = '\0';
-                strcat(paths, line);
-                strcat(paths, "\n");
-                strcpy(line, "");
             } else {
                 nextStep = predecessor[nextStep];
             }
