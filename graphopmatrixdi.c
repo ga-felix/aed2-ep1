@@ -22,6 +22,12 @@ bool initialize(Graph *graph, int nodesNumber) {
     return true;
 }
 
+void initializeArray(int *array) {
+    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++) {
+        array[i] = -1;
+    }
+}
+
 /* Prints a graph structure, going through each valid/existent edge
 value. */
 
@@ -40,15 +46,18 @@ bool print(Graph *graph) {
     }
 
     fprintf(filePointer, "%d %d\n", graph->nodesNumber, graph->edgesNumber);
+    int alreadyPrinted[graph->nodesNumber];
+    initializeArray(alreadyPrinted);
 
     for(int line = 0; line < graph->nodesNumber; line++) {
         fprintf(stdout, "[PRINT] Node %d\nConnections: ", line);
         for(int column = 0; column < graph->nodesNumber; column++) {
-            if(isConnected(graph, line, column)) {
-                fprintf(filePointer, "%d %d %f\n", line, column, graph->adjacencyList[line][column]);
-                fprintf(stdout, "%d (weight %f), ", column, graph->adjacencyList[line][column]);
+            if(isConnected(graph, line, column) && alreadyPrinted[column] != column) {
+                fprintf(filePointer, "%d %d %d\n", line, column, graph->adjacencyList[line][column]);
+                fprintf(stdout, "%d (weight %d), ", column, graph->adjacencyList[line][column]);
             }
         }
+        alreadyPrinted[line] = line;
         fprintf(stdout, "\n");
     }
 
@@ -81,7 +90,7 @@ bool addEdge(Graph *graph, int fromNode, int toNode, Weight weight) {
     graph->adjacencyList[toNode][fromNode] = weight; // Uncomment to generate a digraph
     graph->edgesNumber += 1;
     
-    fprintf(stdout, "[INSERT-EDGE] Edge inserted between %d and %d of weight %f\n", fromNode, toNode, graph->adjacencyList[fromNode][toNode]);
+    fprintf(stdout, "[INSERT-EDGE] Edge inserted between %d and %d of weight %d\n", fromNode, toNode, graph->adjacencyList[fromNode][toNode]);
     return true;
     
 }
@@ -160,7 +169,7 @@ int readGraph(char* fileName, Graph* graph) {
 
     int fromNode, toNode;
     Weight weight;
-    while((fscanf(filePointer, "%d %d %f", &fromNode, &toNode, &weight)) != EOF) {
+    while((fscanf(filePointer, "%d %d %d", &fromNode, &toNode, &weight)) != EOF) {
         addEdge(graph, fromNode, toNode, weight);
     }
 

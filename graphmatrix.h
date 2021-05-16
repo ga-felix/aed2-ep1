@@ -5,7 +5,7 @@
 
 /* Avoids variable types replacement */
 
-typedef float Weight;
+typedef int Weight;
 
 /* Defines graph structure, as well it's attributes */
 
