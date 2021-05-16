@@ -9,4 +9,5 @@ int main() {
 
     readGraph("entrada.txt", &graph);
     print(&graph);
+    DFS(&graph);
 }

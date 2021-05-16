@@ -89,8 +89,10 @@ int readGraph(char* fileName, Graph* graph);
 
 void DFS(Graph* graph);
 
+void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, FILE* f);
+
 /* Breadth first search algorthm */
 
 void BFS(Graph* graph);
 
-void visitBFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor);
+void visitBFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, FILE* f);

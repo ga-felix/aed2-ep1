@@ -177,9 +177,9 @@ int readGraph(char* fileName, Graph* graph) {
     return (1);
 }
 
-/* BFS */
+/* DFS */
 
-void BFS (Graph* graph) {
+void DFS (Graph* graph) {
     int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], endTimer[graph->nodesNumber], predecessor[graph->edgesNumber];
     int time = 0;
     for(int line = 0; line < graph->nodesNumber; line++) {
@@ -187,21 +187,30 @@ void BFS (Graph* graph) {
         predecessor[line] = -1;
     }
 
+    FILE* filePointer = fopen("saida.txt", "a");
+    fprintf(filePointer, "\nBP:\n");
+
     for(int line = 0; line < graph->nodesNumber; line++) {
-        visitBFS(graph, line, &time, colors, foundTimer, endTimer, predecessor);
+        visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, filePointer);
     }
 }
 
 /* Color 0 <=> white, 1 <=> gray, 2 <=> black */
 
-void visitBFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor) {
+void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, FILE* f) {
     colors[node] = 1;
     foundTimer[node] = ++(*time);
+    if(node != graph->nodesNumber - 1) {
+        fprintf(f, "%d ", node);
+    } else {
+        fprintf(f, "%d\n", node);
+    }
+
     for(int column = 0; column < graph->nodesNumber; column++) { // Percorre as adjacências
         if(isConnected(graph, node, column)) { // Checa se existe aresta entre 'node' e 'column'
             if(colors[column] == 0) { // Checa se é branco
                 predecessor[column] = node;
-                visitBFS(graph, column, time, colors, foundTimer, endTimer, predecessor);
+                visitDFS(graph, column, time, colors, foundTimer, endTimer, predecessor, f);
             }
         }
     }
