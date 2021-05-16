@@ -3,7 +3,7 @@
 #include <string.h>
 #include "graphmatrix.h"
 
-#define EMPTY_NODE -1 /* Signs an empty node
+#define EMPTY_NODE -1 /* Signs an empty node.
 
 /* Initializes a new graph, setting all fields to empty default value */
 
