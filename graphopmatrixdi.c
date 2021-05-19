@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "graphmatrix.h"
+#include "queue.h"
 
 #define EMPTY_NODE -1 /* Signs an empty node.
 
@@ -207,7 +208,7 @@ void DFS (Graph* graph) {
 
     for(int line = 0; line < graph->nodesNumber; line++) {
         if(colors[line] == 0){
-            visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, filePointer, tree, paths);
+            visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, tree);
         }
     }
 
@@ -245,7 +246,7 @@ void DFS (Graph* graph) {
 
 /* Color 0 <=> white, 1 <=> gray, 2 <=> black */
 
-void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, FILE* f, char* tree, char* paths) {
+void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, char* tree) {
     colors[node] = 1;
     foundTimer[node] = ++(*time);
     char str[15];
@@ -256,10 +257,85 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
         if(isConnected(graph, node, column)) { // Checa se existe aresta entre 'node' e 'column'
             if(colors[column] == 0) { // Checa se é branco
                 predecessor[column] = node;
-                visitDFS(graph, column, time, colors, foundTimer, endTimer, predecessor, f, tree, paths);
+                visitDFS(graph, column, time, colors, foundTimer, endTimer, predecessor, tree);
             }
         }
     }
     endTimer[node] = ++(*time);
     colors[node] = 2;
+}
+
+void BFS(Graph* graph) {
+    char tree[(graph->nodesNumber * 2)];
+    FILE* filePointer = fopen("saida.txt", "a");
+    tree[0] = '\0';
+    int colors[graph->nodesNumber], distance[graph->nodesNumber], predecessor[graph->nodesNumber];
+    for(int line = 0; line < graph->nodesNumber; line++) {
+        colors[line] = 0;
+        distance[line] = -1;
+        predecessor[line] = -1;
+    }
+    for(int line = 0; line < graph->nodesNumber; line++) {
+        if(colors[line] == 0) {
+            visitBFS(graph, line, colors, distance, predecessor, tree);
+        }
+    }
+
+    fprintf(filePointer, "\nBL:\n");
+    tree[strlen(tree) - 1] = '\0';
+    fprintf(filePointer, "%s", tree);
+
+    char paths[(graph->nodesNumber * graph->edgesNumber * 2)];
+    char str[15];
+    paths[0] = '\0';
+    fprintf(filePointer, "\n\nCaminhos BL:\n");
+
+    for(int index = 0; index < graph->nodesNumber; index++) {
+        char line[(graph->nodesNumber * graph->edgesNumber * 2)];
+        line[0] = '\0';
+        int nextStep = index;
+        bool hasNext = true;
+        while(hasNext) {
+            sprintf(str, "%d ", nextStep);
+            char *tmp = strdup(line);
+            strcpy(line, str);
+            strcat(line, tmp);
+            free(tmp);
+
+            if(predecessor[nextStep] < 0) {
+                hasNext = false;
+                line[strlen(line) - 1] = '\0';
+                strcat(paths, line);
+                strcat(paths, "\n");
+                strcpy(line, "");
+            } else {
+                nextStep = predecessor[nextStep];
+            }
+        }
+    }
+    fprintf(filePointer, "%s", paths);
+}
+
+void visitBFS(Graph* graph, int node, int* colors, int* distance, int* predecessor, char* tree) {
+    colors[node] = 1;
+    distance[node] = 0;
+    Queue* queue = initializeQueue(graph->nodesNumber);
+    insertQueue(queue, node);
+    while(!isEmpty(queue)) {
+        int target = dequeue(queue);
+        char str[15];
+        sprintf(str, "%d ", target);
+        strcat(tree, str);
+        for(int column = 0; column < graph->nodesNumber; column++) {
+            if(isConnected(graph, target, column)) {
+                if(colors[column] == 0) {
+                    colors[column] = 1;
+                    predecessor[column] = target;
+                    distance[column] = distance[target] + 1;
+                    insertQueue(queue, column);
+                }
+            }
+        }
+        colors[target] = 2;
+    }
 }
