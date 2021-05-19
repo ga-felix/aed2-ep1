@@ -5,6 +5,8 @@
 /* Code test of graph library */
 
 int main() {
+    FILE* filePointer = fopen("saida.txt", "w");
+    fclose(filePointer);
     Graph graph;
     readGraph("entrada.txt", &graph);
     print(&graph);

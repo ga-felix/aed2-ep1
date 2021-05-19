@@ -70,7 +70,7 @@ bool print(Graph *graph) {
         alreadyPrinted[line] = line;
         fprintf(stdout, "\n");
     }
-
+    fclose(filePointer);
     return true;
 }
 
@@ -242,6 +242,7 @@ void DFS (Graph* graph) {
         }
     }
     fprintf(filePointer, "%s", paths);
+    fclose(filePointer);
 }
 
 /* Color 0 <=> white, 1 <=> gray, 2 <=> black */
@@ -314,6 +315,7 @@ void BFS(Graph* graph) {
         }
     }
     fprintf(filePointer, "%s", paths);
+    fclose(filePointer);
 }
 
 void visitBFS(Graph* graph, int node, int* colors, int* distance, int* predecessor, char* tree) {
