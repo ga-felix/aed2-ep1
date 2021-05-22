@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "graphmatrix.h"
-#include "queue.h"
 
 /* Code test of graph library */
 

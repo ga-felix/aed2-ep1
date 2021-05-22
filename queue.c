@@ -47,3 +47,4 @@ int last(Queue* queue) {
     if (isEmpty(queue)) return -1;
     return queue->array[queue->last];
 }
+ 

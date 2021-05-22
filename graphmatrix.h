@@ -1,5 +1,4 @@
 #include <stdbool.h>
-
 #define SIZE 50 + 1 /* Avoids '0' nodes value: vertices range 1 to SIZE */
 #define EMPTY_EDGE -1 /* Signs an empty edge
 
@@ -89,7 +88,7 @@ int readGraph(char* fileName, Graph* graph);
 
 void DFS(Graph* graph);
 
-void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, char* tree);
+void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, char* tree, int* articulation, char* component);
 
 /* Breadth first search algorthm */
 

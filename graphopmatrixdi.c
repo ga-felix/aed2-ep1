@@ -4,7 +4,11 @@
 #include "graphmatrix.h"
 #include "queue.h"
 
-#define EMPTY_NODE -1 /* Signs an empty node.
+#define EMPTY_NODE -1 /* Signs an empty node.*/
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
 
 /* Initializes a new graph, setting all fields to empty default value */
 
@@ -187,10 +191,24 @@ int readGraph(char* fileName, Graph* graph) {
     return (1);
 }
 
+void sortString(char* string, int size) {
+      for(int i = 0; i < size - 1; i++) {
+        for (int j = i + 1; j < size; j++) {
+            if (string[i] > string[j]) {
+                char temp = string[i];
+                string[i] = string[j];
+                string[j] = temp;
+         }
+      }
+   }
+}
+
 /* DFS */
 
 void DFS (Graph* graph) {
-    int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], endTimer[graph->nodesNumber], predecessor[graph->nodesNumber];
+    int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], lowest[graph->nodesNumber], predecessor[graph->nodesNumber];
+    int* articulation = (int*) malloc(sizeof(int));
+    *articulation = 0;
     char tree[(graph->nodesNumber * 2)];
     tree[0] = '\0';
     char paths[(graph->nodesNumber * graph->edgesNumber * 2)];
@@ -199,19 +217,37 @@ void DFS (Graph* graph) {
     for(int line = 0; line < graph->nodesNumber; line++) {
         colors[line] = 0;
         foundTimer[line] = 0;
-        endTimer[line] = 0;
+        lowest[line] = 0;
         predecessor[line] = -1;
     }
 
     FILE* filePointer = fopen("saida.txt", "a");
-    fprintf(filePointer, "\nBP:\n");
+    int count = 0;
+    int previous = 0;
 
+    fprintf(filePointer, "\nComponentes conectados:\n");
     for(int line = 0; line < graph->nodesNumber; line++) {
         if(colors[line] == 0){
-            visitDFS(graph, line, &time, colors, foundTimer, endTimer, predecessor, tree);
+            count += 1;
+            fprintf(filePointer, "C%i: ", count);
+            char component[graph->nodesNumber];
+            component[0] = '\0';
+            visitDFS(graph, line, &time, colors, foundTimer, lowest, predecessor, tree, articulation, component);
+            sortString(component, time - previous);
+            for(int i = 0; i < time - previous; i++) {
+                if(i == time - previous - 1) {
+                    fprintf(filePointer, "%c", component[i]);
+                    break;
+                }
+                fprintf(filePointer, "%c ", component[i]);
+            }
+            component[strlen(component) - 1] = '\0';
+            previous = time;
+            fprintf(filePointer, "\n");
         }
     }
 
+    fprintf(filePointer, "\nBP:\n");
     tree[strlen(tree) - 1] = '\0';
     fprintf(filePointer, "%s", tree);
     fprintf(filePointer, "\n\nCaminhos BP:\n");
@@ -242,27 +278,40 @@ void DFS (Graph* graph) {
         }
     }
     fprintf(filePointer, "%s", paths);
+    fprintf(filePointer, "\nVertices de articulacao:\n");
+    fprintf(filePointer, "%i\n", *articulation);
+
     fclose(filePointer);
 }
 
 /* Color 0 <=> white, 1 <=> gray, 2 <=> black */
 
-void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, char* tree) {
+void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* lowest, int* predecessor, char* tree, int* articulation, char* component) {
     colors[node] = 1;
-    foundTimer[node] = ++(*time);
+    lowest[node] = foundTimer[node] = ++(*time);
     char str[15];
     sprintf(str, "%d ", node);
     strcat(tree, str);
+    sprintf(str, "%d", node);
+    strcat(component, str);
 
     for(int column = 0; column < graph->nodesNumber; column++) { // Percorre as adjacências
         if(isConnected(graph, node, column)) { // Checa se existe aresta entre 'node' e 'column'
+            if(colors[column] == 1) { // Aresta de retorno
+                lowest[node] = min(lowest[node], foundTimer[column]);
+            }
+            
             if(colors[column] == 0) { // Checa se é branco
                 predecessor[column] = node;
-                visitDFS(graph, column, time, colors, foundTimer, endTimer, predecessor, tree);
+                visitDFS(graph, column, time, colors, foundTimer, lowest, predecessor, tree, articulation, component);
+                lowest[node] = min(lowest[node], lowest[column]);
+                if(lowest[column] >= foundTimer[node]) {
+                    *articulation += 1;
+                }
             }
         }
     }
-    endTimer[node] = ++(*time);
+    //lowest[node] = ++(*time);
     colors[node] = 2;
 }
 
