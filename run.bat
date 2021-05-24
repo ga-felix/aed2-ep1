@@ -1,1 +1,1 @@
-start cmd.exe /k "cd %~dp0 & gcc -c queue.c & gcc -c graphopmatrixdi.c & gcc -c main.c & gcc -o runmatrix.exe queue.o graphopmatrixdi.o main.o & runmatrix > debug.txt"
+start cmd.exe /k "cd %~dp0 & gcc -c conectividade.c & gcc -c graphopmatrixdi.c & gcc -o conectividade.exe conectividade.o graphopmatrixdi.o & runmatrix"

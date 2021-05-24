@@ -83,15 +83,3 @@ bool minimumPath(Graph* graph, int fromNode, int toNode);
 /* Reads graph from .txt file */
 
 int readGraph(char* fileName, Graph* graph);
-
-/* Depth-first search algorithm */
-
-void DFS(Graph* graph);
-
-void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* endTimer, int* predecessor, char* tree, char* articulation, char* component);
-
-/* Breadth first search algorthm */
-
-void BFS(Graph* graph);
-
-void visitBFS(Graph* graph, int node, int* colors, int* distance, int* predecessor, char* tree);
