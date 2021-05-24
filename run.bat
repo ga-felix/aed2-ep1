@@ -1,1 +1,1 @@
-start cmd.exe /k "cd %~dp0 & gcc -c conectividade.c & gcc -c graphopmatrixdi.c & gcc -o conectividade.exe conectividade.o graphopmatrixdi.o & runmatrix"
+start cmd.exe /k "cd %~dp0 & gcc -c conectividade.c & gcc -c graphopmatrixdi.c & gcc -o conectividade.exe conectividade.o graphopmatrixdi.o & conectividade > debug.txt"

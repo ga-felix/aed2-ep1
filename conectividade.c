@@ -82,9 +82,10 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
                 visitDFS(graph, column, time, colors, foundTimer, lowest, predecessor, tree, articulation, component);
                 lowest[node] = min(lowest[node], lowest[column]);
                 if(lowest[column] >= foundTimer[node] && predecessor[node] != -1) {
+                    fprintf(stdout, "Vertice de articulacao %i\n", node);
                     sprintf(str, "%d ", node);
                     strcat(temp, str);
-                    strcpy(articulation, temp);
+                    strcat(articulation, str);
                 }
             }
         }
