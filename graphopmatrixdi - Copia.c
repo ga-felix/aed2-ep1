@@ -207,8 +207,7 @@ void sortString(char* string, int size) {
 
 void DFS (Graph* graph) {
     int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], lowest[graph->nodesNumber], predecessor[graph->nodesNumber];
-    char articulation[graph->nodesNumber];
-    articulation[0] = '\0';
+    char* articulation;
     char tree[(graph->nodesNumber * 2)];
     tree[0] = '\0';
     char paths[(graph->nodesNumber * graph->edgesNumber * 2)];
@@ -280,8 +279,8 @@ void DFS (Graph* graph) {
     fprintf(filePointer, "%s", paths);
     free(paths);
     fprintf(filePointer, "\nVertices de articulacao:\n");
-    articulation[strlen(articulation) - 1] = '\0';
-    fprintf(filePointer, "%s\n", articulation);
+    //articulation[strlen(articulation) - 1] = '\0';
+    fprintf(filePointer, "%s", articulation);
     fclose(filePointer);
 }
 
@@ -291,8 +290,6 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
     colors[node] = 1;
     lowest[node] = foundTimer[node] = ++(*time);
     char str[15];
-    char temp[graph->nodesNumber];
-    temp[0] = '\0';
     sprintf(str, "%d ", node);
     strcat(tree, str);
     sprintf(str, "%d", node);
@@ -309,13 +306,21 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
                 visitDFS(graph, column, time, colors, foundTimer, lowest, predecessor, tree, articulation, component);
                 lowest[node] = min(lowest[node], lowest[column]);
                 if(lowest[column] >= foundTimer[node] && predecessor[node] != -1) {
-                    sprintf(str, "%d ", node);
-                    strcat(temp, str);
-                    strcpy(articulation, temp);
+                    /*char* tmp = realloc(articulation, ((sizeof(articulation) / sizeof(char)) + 1) * sizeof(char));
+                    if(!tmp) {
+                        fprintf(stderr, "[DFS] Realloc to articulation buffer failed.\n");
+                        free(articulation);
+                        exit(-1);
+                    }
+                    articulation = tmp;*/
+                    char temp[0];
+                    sprintf(temp, "%i", node);
+                    strcat(articulation, temp);
                 }
             }
         }
     }
+    //lowest[node] = ++(*time);
     colors[node] = 2;
 }
 
