@@ -8,11 +8,21 @@
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
 
+/* Definição da estrutura auxiliar de fila */
+
 typedef struct {
     int first, last, size;
     unsigned capacity;
     int* array;
 } Queue;
+
+/* Procedimentos necessários para manipular a fila:
+- Inicialização
+- Cheio
+- Vazio
+- Push
+- Pop
+*/
 
 Queue* initializeQueue(unsigned capacity) {
     Queue* queue = (Queue*) malloc(sizeof(Queue));
@@ -46,24 +56,34 @@ int dequeue(Queue* queue) {
     return item;
 }
 
+/* Função auxiliar de ordenação de string usando
+Insertion Sort. No melhor caso, que pode ser frequente
+aqui, ele tem desempenho linear. */
+
 void sortString(char* string, int size) {
-    for(int i = 0; i < size - 1; i++) {
-        for (int j = i + 1; j < size; j++) {
-            if (string[i] > string[j]) {
-                char temp = string[i];
-                string[i] = string[j];
-                string[j] = temp;
-         }
-      }
+    int i, j;
+    for(i = 0; i < size; i++) {
+        char key = string[i];
+        j = i - 1;
+        while(j >= 0 && string[j] > key) {
+            string[j + 1] = string[j];
+            j = j - 1;
+        }
+        string[j + 1] = key;
    }
 }
 
-/* Color 0 <=> white, 1 <=> gray, 2 <=> black */
+/* Implementação da busca em profundidade e suas funções
+auxiliares.
+Tabela de cores (número, cor):
+0 <=> branco
+1 <=> cinza
+2 <=> preto */
 
 void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* lowest, int* predecessor, char* tree, char* articulation, char* component) {
     colors[node] = 1;
     lowest[node] = foundTimer[node] = ++(*time);
-    char str[15];
+    char str[4];
     char temp[graph->nodesNumber];
     temp[0] = '\0';
     sprintf(str, "%d ", node);
@@ -71,7 +91,8 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
     sprintf(str, "%d", node);
     strcat(component, str);
 
-    for(int column = 0; column < graph->nodesNumber; column++) { // Percorre as adjacências
+    int column;
+    for(column = 0; column < graph->nodesNumber; column++) { // Percorre as adjacências
         if(isConnected(graph, node, column)) { // Checa se existe aresta entre 'node' e 'column'
             if(colors[column] == 1) { // Aresta de retorno
                 lowest[node] = min(lowest[node], foundTimer[column]);
@@ -140,8 +161,7 @@ void DFS (Graph* graph) {
     fprintf(filePointer, "%s", tree);
     fprintf(filePointer, "\n\nCaminhos BP:\n");
 
-    char str[15];
-    // SAFELINE
+    char str[4];
     for(int index = 0; index < graph->nodesNumber; index++) {
         char line[(graph->nodesNumber * graph->edgesNumber * 2)];
         line[0] = '\0';
@@ -173,6 +193,13 @@ void DFS (Graph* graph) {
     fclose(filePointer);
 }
 
+/* Implementação da busca em largura e suas funções
+auxiliares.
+Tabela de cores (número, cor):
+0 <=> branco
+1 <=> cinza
+2 <=> preto */
+
 void visitBFS(Graph* graph, int node, int* colors, int* distance, int* predecessor, char* tree) {
     colors[node] = 1;
     distance[node] = 0;
@@ -180,7 +207,7 @@ void visitBFS(Graph* graph, int node, int* colors, int* distance, int* predecess
     insertQueue(queue, node);
     while(!isEmpty(queue)) {
         int target = dequeue(queue);
-        char str[15];
+        char str[4];
         sprintf(str, "%d ", target);
         strcat(tree, str);
         for(int column = 0; column < graph->nodesNumber; column++) {
@@ -218,7 +245,7 @@ void BFS(Graph* graph) {
     fprintf(filePointer, "%s", tree);
 
     char paths[(graph->nodesNumber * graph->edgesNumber * 2)];
-    char str[15];
+    char str[4];
     paths[0] = '\0';
     fprintf(filePointer, "\n\nCaminhos BL:\n");
 
@@ -248,6 +275,8 @@ void BFS(Graph* graph) {
     fprintf(filePointer, "%s", paths);
     fclose(filePointer);
 }
+
+/* Função de teste. Entrada do programa. */
 
 int main() {
     FILE* filePointer = fopen("saida.txt", "w");

@@ -176,10 +176,17 @@ int readGraph(char* fileName, Graph* graph) {
         return (0);
     initialize(graph, nodes);
 
+    int count = 0;
     int fromNode, toNode;
     Weight weight;
     while((fscanf(filePointer, "%d %d %d", &fromNode, &toNode, &weight)) != EOF) {
         addEdge(graph, fromNode, toNode, weight);
+        count += 1;
+    }
+
+    if(count != edges) {
+        fprintf(stderr, "[READ-GRAPH] Number of found edges (%d) is differs from the given edges number (%d).", count, edges);
+        return (0);
     }
 
     fclose(filePointer);
