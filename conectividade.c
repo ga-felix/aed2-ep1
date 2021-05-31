@@ -8,6 +8,42 @@
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
 
+typedef struct {
+    int array[SIZE];
+    int top;
+} List;
+
+List* initializeList() {
+    List* list = (List*) malloc(sizeof(List));
+    list->top = 0;
+    list->array[list->top] = -1;
+    return list;
+}
+
+void add(List* list, int value) {
+    int i;
+    for(i = 0; i < list->top; i++) {
+        if(list->array[i] == value) return;
+    }
+    list->array[list->top] = value;
+    list->top += 1;
+    list->array[list->top] = -1;
+}
+
+void sortList(int* array, int size) {
+    int i, j;
+    for(i = 0; i < size; i++) {
+        int key = array[i];
+        j = i - 1;
+        while(j >= 0 && array[j] > key) {
+            array[j + 1] = array[j];
+            j = j - 1;
+        }
+        array[j + 1] = key;
+   }
+}
+
+
 /* Definição da estrutura auxiliar de fila */
 
 typedef struct {
@@ -56,23 +92,6 @@ int dequeue(Queue* queue) {
     return item;
 }
 
-/* Função auxiliar de ordenação de string usando
-Insertion Sort. No melhor caso, que pode ser frequente
-aqui, ele tem desempenho linear. */
-
-void sortString(char* string, int size) {
-    int i, j;
-    for(i = 0; i < size; i++) {
-        char key = string[i];
-        j = i - 1;
-        while(j >= 0 && string[j] > key) {
-            string[j + 1] = string[j];
-            j = j - 1;
-        }
-        string[j + 1] = key;
-   }
-}
-
 /* Implementação da busca em profundidade e suas funções
 auxiliares.
 Tabela de cores (número, cor):
@@ -80,7 +99,7 @@ Tabela de cores (número, cor):
 1 <=> cinza
 2 <=> preto */
 
-void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* lowest, int* predecessor, char* tree, char* articulation, char* component) {
+void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, int* lowest, int* predecessor, char* tree, List* articulation, List* component) {
     colors[node] = 1;
     lowest[node] = foundTimer[node] = ++(*time);
     char str[4];
@@ -88,8 +107,7 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
     temp[0] = '\0';
     sprintf(str, "%d ", node);
     strcat(tree, str);
-    sprintf(str, "%d", node);
-    strcat(component, str);
+    add(component, node);
 
     int column;
     for(column = 0; column < graph->nodesNumber; column++) { // Percorre as adjacências
@@ -104,9 +122,7 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
                 lowest[node] = min(lowest[node], lowest[column]);
                 if(lowest[column] >= foundTimer[node] && predecessor[node] != -1) {
                     fprintf(stdout, "Vertice de articulacao %i\n", node);
-                    sprintf(str, "%d ", node);
-                    strcat(temp, str);
-                    strcat(articulation, str);
+                    add(articulation, node);
                 }
             }
         }
@@ -116,9 +132,11 @@ void visitDFS(Graph* graph, int node, int* time, int* colors, int* foundTimer, i
 
 void DFS (Graph* graph) {
     int colors[graph->nodesNumber], foundTimer[graph->nodesNumber], lowest[graph->nodesNumber], predecessor[graph->nodesNumber];
-    char articulation[graph->nodesNumber];
-    articulation[0] = '\0';
-    char tree[(graph->nodesNumber * 2)];
+    List* articulation = initializeList();
+    List* component = initializeList();
+    char groups[(graph->nodesNumber * 4)];
+    groups[0] = '\0';
+    char tree[(graph->nodesNumber * 4)];
     tree[0] = '\0';
     char paths[(graph->nodesNumber * graph->edgesNumber * 2)];
     paths[0] = '\0';
@@ -133,26 +151,25 @@ void DFS (Graph* graph) {
     FILE* filePointer = fopen("saida.txt", "a");
     int count = 0;
     int previous = 0;
-    
-    fprintf(filePointer, "\nComponentes conectados:\n");
+
     for(int line = 0; line < graph->nodesNumber; line++) {
         if(colors[line] == 0){
             count += 1;
-            fprintf(filePointer, "C%i: ", count);
-            char component[graph->nodesNumber];
-            component[0] = '\0';
+            char aux[4];
+            sprintf(aux, "C%d: ", count);
+            strcat(groups, aux);
+            strcpy(aux, "");
             visitDFS(graph, line, &time, colors, foundTimer, lowest, predecessor, tree, articulation, component);
-            sortString(component, time - previous);
-            for(int i = 0; i < time - previous; i++) {
-                if(i == time - previous - 1) {
-                    fprintf(filePointer, "%c", component[i]);
-                    break;
-                }
-                fprintf(filePointer, "%c ", component[i]);
+            int i;
+            for(i = 0; i < component->top - 1; i++) {
+                sprintf(aux, "%d ", component->array[i]);
+                strcat(groups, aux);
+                strcpy(aux, "");
             }
-            component[strlen(component) - 1] = '\0';
-            previous = time;
-            fprintf(filePointer, "\n");
+            sprintf(aux, "%d\n", component->array[component->top - 1]);
+            strcat(groups, aux);
+            strcpy(aux, "");
+            component->top = 0;
         }
     }
     
@@ -185,11 +202,16 @@ void DFS (Graph* graph) {
             }
         }
     }
-    
     fprintf(filePointer, "%s", paths);
-    fprintf(filePointer, "\nVertices de articulacao:\n");
-    articulation[strlen(articulation) - 1] = '\0';
-    fprintf(filePointer, "%s\n", articulation);
+    fprintf(filePointer, "\nComponentes Conectados:\n");
+    fprintf(filePointer, "%s", groups);
+    fprintf(filePointer, "\nVertices de articulação:\n");
+    sortList(articulation->array, articulation->top);
+    int i;
+    for(i = 0; i < articulation->top - 1; i++) {
+        fprintf(filePointer, "%d ", articulation->array[i]);
+    }
+    fprintf(filePointer, "%d\n", articulation->array[articulation->top - 1]);
     fclose(filePointer);
 }
 

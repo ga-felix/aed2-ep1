@@ -186,7 +186,7 @@ int readGraph(char* fileName, Graph* graph) {
 
     if(count != edges) {
         fprintf(stderr, "[READ-GRAPH] Number of found edges (%d) is differs from the given edges number (%d).", count, edges);
-        return (0);
+        exit(0);
     }
 
     fclose(filePointer);
